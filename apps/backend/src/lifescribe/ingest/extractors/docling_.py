@@ -6,16 +6,6 @@ from typing import ClassVar
 from lifescribe.ingest.extractors.base import ExtractionResult
 
 
-def _pdf_page_count(path: Path) -> int:
-    import pypdfium2
-
-    doc = pypdfium2.PdfDocument(str(path))
-    try:
-        return len(doc)
-    finally:
-        doc.close()
-
-
 class DoclingExtractor:
     NAME: ClassVar[str] = "docling"
     VERSION: ClassVar[str] = "0.1.0"
@@ -33,7 +23,7 @@ class DoclingExtractor:
 
         extra_frontmatter: dict[str, str | int] = {"docling_source": str(path)}
         if path.suffix.lower() == ".pdf":
-            extra_frontmatter["page_count"] = _pdf_page_count(path)
+            extra_frontmatter["page_count"] = len(result.pages)
 
         return ExtractionResult(
             body_markdown=markdown + "\n",

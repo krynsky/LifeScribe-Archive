@@ -9,8 +9,6 @@ from lifescribe.ingest.extractors.docx import DocxExtractor
 from lifescribe.ingest.extractors.html_ import HtmlExtractor
 from lifescribe.ingest.extractors.image import ImageExtractor
 from lifescribe.ingest.extractors.json_ import JsonExtractor
-from lifescribe.ingest.extractors.markitdown_ import MarkItDownExtractor
-from lifescribe.ingest.extractors.pdf import PdfExtractor
 from lifescribe.ingest.extractors.registry import ExtractorRegistry
 from lifescribe.ingest.extractors.router import RoutedExtractor
 from lifescribe.ingest.extractors.text import MarkdownExtractor, TextExtractor
@@ -37,10 +35,7 @@ def _routed(
     *,
     include_native: Extractor | None = None,
 ) -> RoutedExtractor:
-    extractors: list[Extractor] = [
-        cast(Extractor, DoclingExtractor(mimes=mimes)),
-        cast(Extractor, MarkItDownExtractor(mimes=mimes)),
-    ]
+    extractors: list[Extractor] = [cast(Extractor, DoclingExtractor(mimes=mimes))]
     if include_native is not None:
         extractors.append(include_native)
     return RoutedExtractor(mimes=mimes, extractors=extractors)
@@ -59,7 +54,7 @@ def default_registry() -> ExtractorRegistry:
     reg.register(MarkdownExtractor())
     reg.register(JsonExtractor())
     reg.register(CsvExtractor())
-    reg.register(cast(Extractor, _routed(PDF_MIMES, include_native=PdfExtractor())))
+    reg.register(cast(Extractor, _docling_only(PDF_MIMES)))
     reg.register(cast(Extractor, _routed(DOCX_MIMES, include_native=DocxExtractor())))
     reg.register(cast(Extractor, _routed(XLSX_MIMES, include_native=XlsxExtractor())))
     reg.register(cast(Extractor, _docling_only(PPTX_MIMES)))

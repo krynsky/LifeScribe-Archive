@@ -47,16 +47,35 @@ def test_multiple_mimes_per_extractor() -> None:
     assert reg.find("text/markdown") is not None
 
 
-def test_default_registry_routes_pdf_through_docling_first_chain() -> None:
+def test_default_registry_routes_pdf_through_docling_only() -> None:
     extractor = default_registry().find("application/pdf")
 
     assert isinstance(extractor, RoutedExtractor)
     child_ids = [f"{child.NAME}@{child.VERSION}" for child in extractor.extractors_for_tests()]
-    assert child_ids[0] == "docling@0.1.0"
-    assert "pdf@0.1.0" in child_ids
+    assert child_ids == ["docling@0.1.0"]
 
 
-def test_default_registry_routes_no_native_formats_through_docling_only() -> None:
+def test_default_registry_routes_docx_docling_then_native() -> None:
+    extractor = default_registry().find(
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+
+    assert isinstance(extractor, RoutedExtractor)
+    child_ids = [f"{child.NAME}@{child.VERSION}" for child in extractor.extractors_for_tests()]
+    assert child_ids == ["docling@0.1.0", "docx@0.1.0"]
+
+
+def test_default_registry_routes_xlsx_docling_then_native() -> None:
+    extractor = default_registry().find(
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    assert isinstance(extractor, RoutedExtractor)
+    child_ids = [f"{child.NAME}@{child.VERSION}" for child in extractor.extractors_for_tests()]
+    assert child_ids == ["docling@0.1.0", "xlsx@0.1.0"]
+
+
+def test_default_registry_routes_pptx_epub_through_docling_only() -> None:
     reg = default_registry()
 
     pptx = reg.find("application/vnd.openxmlformats-officedocument.presentationml.presentation")

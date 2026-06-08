@@ -18,9 +18,14 @@ class _FakeDocument:
         return self._markdown
 
 
+class _FakePage:
+    pass
+
+
 class _FakeResult:
-    def __init__(self, markdown: str) -> None:
+    def __init__(self, markdown: str, *, page_count: int = 1) -> None:
         self.document = _FakeDocument(markdown)
+        self.pages = [_FakePage() for _ in range(page_count)]
 
 
 class _FakeDocumentConverter:
