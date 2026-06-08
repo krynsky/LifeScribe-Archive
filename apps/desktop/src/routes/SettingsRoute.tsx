@@ -10,7 +10,32 @@ import {
   useSaveSettings,
   useSettings,
 } from "../api/queries";
+import { LLMProviderDTO } from "../api/client";
 import ConnectorsBrowser from "../components/ConnectorsBrowser";
+
+type ProviderType = "ollama" | "lmstudio" | "github_models" | "custom";
+
+const PRESETS: Record<ProviderType, { display_name: string; base_url: string; local: boolean }> = {
+  ollama: { display_name: "Ollama", base_url: "http://localhost:11434/v1", local: true },
+  lmstudio: { display_name: "LM Studio", base_url: "http://127.0.0.1:1234/v1", local: true },
+  github_models: {
+    display_name: "GitHub Models",
+    base_url: "https://models.inference.ai.azure.com",
+    local: false,
+  },
+  custom: { display_name: "", base_url: "", local: true },
+};
+
+function ProviderStatusBadge({ providerId }: { providerId: string }) {
+  const { data, isLoading, isError } = useLLMModels(providerId);
+  if (isLoading) return <span style={{ color: "#888" }}>Checking…</span>;
+  if (isError || !data) return <span style={{ color: "#b00" }}>Offline</span>;
+  return (
+    <span style={{ color: "#080" }}>
+      Online · {data.length} model{data.length !== 1 ? "s" : ""}
+    </span>
+  );
+}
 
 function DefaultChatModel() {
   const { data: providers } = useLLMProviders();
@@ -20,13 +45,17 @@ function DefaultChatModel() {
   const { data: models } = useLLMModels(providerId || undefined);
   const [model, setModel] = useState(settings?.default_chat_model ?? "");
 
-  // Sync local state when settings load
   useEffect(() => {
     if (settings) {
       setProviderId(settings.default_chat_provider_id ?? "");
       setModel(settings.default_chat_model ?? "");
     }
   }, [settings]);
+
+  function providerLabel(p: LLMProviderDTO) {
+    const tag = p.provider_type && p.provider_type !== "custom" ? ` (${p.provider_type})` : "";
+    return `${p.display_name}${tag}`;
+  }
 
   return (
     <fieldset>
@@ -35,7 +64,7 @@ function DefaultChatModel() {
         <option value="">— none —</option>
         {providers?.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.display_name}
+            {providerLabel(p)}
           </option>
         ))}
       </select>{" "}
@@ -68,16 +97,34 @@ function LLMProvidersSection() {
   const { data: providers } = useLLMProviders();
   const create = useCreateLLMProvider();
   const del = useDeleteLLMProvider();
+  const [providerType, setProviderType] = useState<ProviderType>("custom");
   const [displayName, setDisplayName] = useState("");
-  const [baseUrl, setBaseUrl] = useState("http://127.0.0.1:1234/v1");
+  const [baseUrl, setBaseUrl] = useState("");
   const [local, setLocal] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+
+  function onTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const t = e.target.value as ProviderType;
+    setProviderType(t);
+    const preset = PRESETS[t];
+    setDisplayName(preset.display_name);
+    setBaseUrl(preset.base_url);
+    setLocal(preset.local);
+  }
 
   async function onAdd() {
     setErr(null);
     try {
-      await create.mutateAsync({ display_name: displayName, base_url: baseUrl, local });
+      await create.mutateAsync({
+        display_name: displayName,
+        base_url: baseUrl,
+        local,
+        provider_type: providerType,
+      });
       setDisplayName("");
+      setBaseUrl("");
+      setProviderType("custom");
+      setLocal(true);
     } catch (e) {
       setErr((e as Error).message);
     }
@@ -85,7 +132,7 @@ function LLMProvidersSection() {
 
   return (
     <fieldset>
-      <legend>LLM Providers</legend>
+      <legend>Configured providers</legend>
       {providers && providers.length === 0 && (
         <div style={{ color: "#888", marginBottom: 8 }}>No providers yet.</div>
       )}
@@ -96,6 +143,7 @@ function LLMProvidersSection() {
             <span style={{ color: "#666" }}>
               ({p.local ? "local" : "remote"}) — {p.base_url}
             </span>{" "}
+            <ProviderStatusBadge providerId={p.id} />{" "}
             <button
               type="button"
               onClick={() => {
@@ -109,6 +157,13 @@ function LLMProvidersSection() {
         ))}
       </ul>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <label htmlFor="provider-type-select">Provider type</label>
+        <select id="provider-type-select" value={providerType} onChange={onTypeChange}>
+          <option value="ollama">Ollama</option>
+          <option value="lmstudio">LM Studio</option>
+          <option value="github_models">GitHub Models</option>
+          <option value="custom">Custom</option>
+        </select>
         <input
           placeholder="Display name (e.g. LM Studio)"
           value={displayName}
