@@ -43,10 +43,8 @@ describe("SettingsRoute", () => {
     const typeSelect = screen.getByRole("combobox", { name: /provider type/i });
     await userEvent.selectOptions(typeSelect, "ollama");
 
-    const nameInput = screen.getByPlaceholderText(/display name/i) as HTMLInputElement;
-    const urlInput = screen.getByPlaceholderText(/base url/i) as HTMLInputElement;
-    expect(nameInput.value).toBe("Ollama");
-    expect(urlInput.value).toBe("http://localhost:11434/v1");
+    expect(screen.getByPlaceholderText(/display name/i)).toHaveValue("Ollama");
+    expect(screen.getByPlaceholderText(/base url/i)).toHaveValue("http://localhost:11434/v1");
   });
 
   it("selecting LM Studio preset pre-fills name and URL", async () => {
@@ -62,10 +60,8 @@ describe("SettingsRoute", () => {
     const typeSelect = screen.getByRole("combobox", { name: /provider type/i });
     await userEvent.selectOptions(typeSelect, "lmstudio");
 
-    const nameInput = screen.getByPlaceholderText(/display name/i) as HTMLInputElement;
-    const urlInput = screen.getByPlaceholderText(/base url/i) as HTMLInputElement;
-    expect(nameInput.value).toBe("LM Studio");
-    expect(urlInput.value).toBe("http://127.0.0.1:1234/v1");
+    expect(screen.getByPlaceholderText(/display name/i)).toHaveValue("LM Studio");
+    expect(screen.getByPlaceholderText(/base url/i)).toHaveValue("http://127.0.0.1:1234/v1");
   });
 
   it("provider row shows Online status when models load", async () => {

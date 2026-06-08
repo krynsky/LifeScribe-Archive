@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 
 import {
   useCreateLLMProvider,
@@ -103,7 +103,7 @@ function LLMProvidersSection() {
   const [local, setLocal] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  function onTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  function onTypeChange(e: ChangeEvent<HTMLSelectElement>) {
     const t = e.target.value as ProviderType;
     setProviderType(t);
     const preset = PRESETS[t];
