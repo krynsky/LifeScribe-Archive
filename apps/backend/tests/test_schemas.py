@@ -12,6 +12,7 @@ from lifescribe.vault.schemas import (
     ConnectorRecord,
     DocumentRecord,
     IngestionLogEntry,
+    LLMProvider,
     Note,
     PrivacyLabel,
     SourceRecord,
@@ -302,8 +303,6 @@ def test_chat_turn_default_empty_retrieval_false() -> None:
 
 
 def test_llm_provider_defaults_provider_type_to_custom() -> None:
-    from lifescribe.vault.schemas import LLMProvider
-
     note = LLMProvider(
         id="llm_x_abc123",
         type="LLMProvider",
@@ -315,8 +314,6 @@ def test_llm_provider_defaults_provider_type_to_custom() -> None:
 
 
 def test_llm_provider_accepts_ollama_type() -> None:
-    from lifescribe.vault.schemas import LLMProvider
-
     note = LLMProvider(
         id="llm_ollama_abc123",
         type="LLMProvider",
@@ -329,8 +326,6 @@ def test_llm_provider_accepts_ollama_type() -> None:
 
 
 def test_llm_provider_parses_provider_type_from_dict() -> None:
-    from lifescribe.vault.schemas import parse_note
-
     data = {
         "id": "llm_ollama_abc123",
         "type": "LLMProvider",
@@ -349,8 +344,6 @@ def test_llm_provider_parses_provider_type_from_dict() -> None:
 
 
 def test_llm_provider_missing_provider_type_defaults_custom() -> None:
-    from lifescribe.vault.schemas import parse_note
-
     data = {
         "id": "llm_old_abc123",
         "type": "LLMProvider",
