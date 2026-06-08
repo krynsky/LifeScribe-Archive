@@ -204,6 +204,7 @@ class VaultSettings(_NoteBase):
 class LLMProvider(_NoteBase):
     type: Literal["LLMProvider"] = "LLMProvider"
     adapter: Literal["openai_compatible"] = "openai_compatible"
+    provider_type: Literal["ollama", "lmstudio", "github_models", "custom"] = "custom"
     display_name: str
     base_url: str
     local: bool
