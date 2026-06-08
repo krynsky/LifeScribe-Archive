@@ -139,6 +139,7 @@ export interface LLMProviderDTO {
   enabled: boolean;
   has_credential: boolean;
   schema_version: number;
+  provider_type: "ollama" | "lmstudio" | "github_models" | "custom";
 }
 
 export interface ModelInfoDTO {
