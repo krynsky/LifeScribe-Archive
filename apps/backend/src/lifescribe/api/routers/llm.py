@@ -6,7 +6,7 @@ import secrets as _secrets
 import time
 from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -90,6 +90,7 @@ class _ProviderBody(BaseModel):
     base_url: str
     local: bool
     adapter: str = "openai_compatible"
+    provider_type: Literal["ollama", "lmstudio", "github_models", "custom"] = "custom"
     secret_ref: str | None = None
     default_model: str | None = None
     enabled: bool = True
@@ -124,6 +125,7 @@ def create_provider(body: _ProviderBody) -> dict[str, Any]:
         id=pid,
         type="LLMProvider",
         adapter="openai_compatible",
+        provider_type=body.provider_type,
         display_name=body.display_name,
         base_url=body.base_url,
         local=body.local,
@@ -148,6 +150,7 @@ def update_provider(provider_id: str, body: _ProviderBody) -> dict[str, Any]:
         id=provider_id,
         type="LLMProvider",
         adapter="openai_compatible",
+        provider_type=body.provider_type,
         display_name=body.display_name,
         base_url=body.base_url,
         local=body.local,

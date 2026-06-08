@@ -96,3 +96,50 @@ def test_delete_provider_removes_note_and_credential(tmp_path) -> None:
     assert r.status_code == 204
     r = client.get(f"/llm/providers/{pid}", headers=AUTH)
     assert r.status_code == 404
+
+
+def test_create_provider_stores_and_returns_provider_type(tmp_path) -> None:
+    _, client = _setup(tmp_path)
+    body = {
+        "display_name": "Ollama",
+        "base_url": "http://localhost:11434/v1",
+        "local": True,
+        "provider_type": "ollama",
+    }
+    r = client.post("/llm/providers", json=body, headers=AUTH)
+    assert r.status_code == 201
+    assert r.json()["provider_type"] == "ollama"
+
+
+def test_create_provider_defaults_provider_type_to_custom(tmp_path) -> None:
+    _, client = _setup(tmp_path)
+    body = {
+        "display_name": "My Provider",
+        "base_url": "http://127.0.0.1:1234/v1",
+        "local": True,
+    }
+    r = client.post("/llm/providers", json=body, headers=AUTH)
+    assert r.status_code == 201
+    assert r.json()["provider_type"] == "custom"
+
+
+def test_update_provider_changes_provider_type(tmp_path) -> None:
+    _, client = _setup(tmp_path)
+    r = client.post(
+        "/llm/providers",
+        json={"display_name": "X", "base_url": "http://localhost:11434/v1", "local": True},
+        headers=AUTH,
+    )
+    pid = r.json()["id"]
+    r = client.put(
+        f"/llm/providers/{pid}",
+        json={
+            "display_name": "Ollama",
+            "base_url": "http://localhost:11434/v1",
+            "local": True,
+            "provider_type": "ollama",
+        },
+        headers=AUTH,
+    )
+    assert r.status_code == 200
+    assert r.json()["provider_type"] == "ollama"
