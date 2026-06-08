@@ -14,7 +14,7 @@ class MarkItDownExtractor:
         self.mimes = mimes
 
     def extract(self, path: Path) -> ExtractionResult:
-        from markitdown import MarkItDown  # type: ignore[import-untyped,import-not-found]
+        from markitdown import MarkItDown
 
         result = MarkItDown().convert(path)
         markdown = str(result.text_content).strip()

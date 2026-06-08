@@ -88,9 +88,7 @@ describe("SettingsRoute", () => {
       ),
     );
     renderWithProviders(<SettingsRoute />, { initialEntries: ["/settings"] });
-    await waitFor(() =>
-      expect(screen.getByText(/Online · 2 models/i)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(/Online · 2 models/i)).toBeInTheDocument());
   });
 
   it("provider row shows Offline when models endpoint errors", async () => {
@@ -117,8 +115,6 @@ describe("SettingsRoute", () => {
       ),
     );
     renderWithProviders(<SettingsRoute />, { initialEntries: ["/settings"] });
-    await waitFor(() =>
-      expect(screen.getByText(/Offline/i)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(/Offline/i)).toBeInTheDocument());
   });
 });
