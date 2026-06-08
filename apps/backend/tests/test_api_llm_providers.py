@@ -109,6 +109,9 @@ def test_create_provider_stores_and_returns_provider_type(tmp_path) -> None:
     r = client.post("/llm/providers", json=body, headers=AUTH)
     assert r.status_code == 201
     assert r.json()["provider_type"] == "ollama"
+    pid = r.json()["id"]
+    r2 = client.get(f"/llm/providers/{pid}", headers=AUTH)
+    assert r2.json()["provider_type"] == "ollama"
 
 
 def test_create_provider_defaults_provider_type_to_custom(tmp_path) -> None:
@@ -143,3 +146,5 @@ def test_update_provider_changes_provider_type(tmp_path) -> None:
     )
     assert r.status_code == 200
     assert r.json()["provider_type"] == "ollama"
+    r2 = client.get(f"/llm/providers/{pid}", headers=AUTH)
+    assert r2.json()["provider_type"] == "ollama"
