@@ -28,7 +28,6 @@ const PRESETS: Record<ProviderType, { display_name: string; base_url: string; lo
 
 function ProviderStatusBadge({ providerId }: { providerId: string }) {
   const { data, isLoading, isError } = useLLMModels(providerId);
-  if (!providerId) return null;
   if (isLoading) return <span style={{ color: "#888" }}>Checking…</span>;
   if (isError || !data) return <span style={{ color: "#b00" }}>Offline</span>;
   return (

@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from lifescribe.llm.openai_compatible import OpenAICompatibleClient
 from lifescribe.vault.schemas import LLMProvider
 
+# Preset dataclass for Ollama. Not wired into ProviderRegistry — all provider
+# types use OpenAICompatibleClient directly via the registry. This class
+# documents the Ollama configuration and is available for future adapter routing.
+
 
 @dataclass
 class OllamaProvider:
