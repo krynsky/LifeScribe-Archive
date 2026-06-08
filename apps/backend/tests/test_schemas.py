@@ -12,6 +12,7 @@ from lifescribe.vault.schemas import (
     ConnectorRecord,
     DocumentRecord,
     IngestionLogEntry,
+    LLMProvider,
     Note,
     PrivacyLabel,
     SourceRecord,
@@ -299,3 +300,61 @@ def test_chat_turn_default_empty_retrieval_false() -> None:
     turn = ChatTurn(role="user", content="x", created_at=datetime.now(tz=UTC))
     assert turn.empty_retrieval is False
     assert turn.citations == []
+
+
+def test_llm_provider_defaults_provider_type_to_custom() -> None:
+    note = LLMProvider(
+        id="llm_x_abc123",
+        type="LLMProvider",
+        display_name="X",
+        base_url="http://localhost:11434/v1",
+        local=True,
+    )
+    assert note.provider_type == "custom"
+
+
+def test_llm_provider_accepts_ollama_type() -> None:
+    note = LLMProvider(
+        id="llm_ollama_abc123",
+        type="LLMProvider",
+        display_name="Ollama",
+        base_url="http://localhost:11434/v1",
+        local=True,
+        provider_type="ollama",
+    )
+    assert note.provider_type == "ollama"
+
+
+def test_llm_provider_parses_provider_type_from_dict() -> None:
+    data = {
+        "id": "llm_ollama_abc123",
+        "type": "LLMProvider",
+        "schema_version": 1,
+        "adapter": "openai_compatible",
+        "display_name": "Ollama",
+        "base_url": "http://localhost:11434/v1",
+        "local": True,
+        "secret_ref": None,
+        "default_model": None,
+        "enabled": True,
+        "provider_type": "ollama",
+    }
+    note = parse_note(data)
+    assert note.provider_type == "ollama"  # type: ignore[union-attr]
+
+
+def test_llm_provider_missing_provider_type_defaults_custom() -> None:
+    data = {
+        "id": "llm_old_abc123",
+        "type": "LLMProvider",
+        "schema_version": 1,
+        "adapter": "openai_compatible",
+        "display_name": "Old Provider",
+        "base_url": "http://127.0.0.1:1234/v1",
+        "local": True,
+        "secret_ref": None,
+        "default_model": None,
+        "enabled": True,
+    }
+    note = parse_note(data)
+    assert note.provider_type == "custom"  # type: ignore[union-attr]

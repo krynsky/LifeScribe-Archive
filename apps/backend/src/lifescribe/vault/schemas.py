@@ -45,6 +45,10 @@ class SourceRecord(_NoteBase, _ProvenanceMixin):
     original_filename: str
     size_bytes: int = Field(ge=0)
     page_count: int | None = None
+    engine_router: str | None = None
+    engine_selected: str | None = None
+    engine_attempts: list[str] = Field(default_factory=list)
+    engine_warnings: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _check_id_prefix(self) -> SourceRecord:
@@ -200,6 +204,7 @@ class VaultSettings(_NoteBase):
 class LLMProvider(_NoteBase):
     type: Literal["LLMProvider"] = "LLMProvider"
     adapter: Literal["openai_compatible"] = "openai_compatible"
+    provider_type: Literal["ollama", "lmstudio", "github_models", "custom"] = "custom"
     display_name: str
     base_url: str
     local: bool
@@ -228,6 +233,7 @@ class ChatTurn(BaseModel):
     role: Literal["user", "assistant"]
     content: str
     created_at: datetime
+    reasoning_content: str = ""
     citations: list[ChatCitation] = Field(default_factory=list)
     empty_retrieval: bool = False
 
