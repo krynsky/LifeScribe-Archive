@@ -13,7 +13,7 @@ import {
 import { LLMProviderDTO } from "../api/client";
 import ConnectorsBrowser from "../components/ConnectorsBrowser";
 
-type ProviderType = "ollama" | "lmstudio" | "github_models" | "custom";
+type ProviderType = LLMProviderDTO["provider_type"];
 
 const PRESETS: Record<ProviderType, { display_name: string; base_url: string; local: boolean }> = {
   ollama: { display_name: "Ollama", base_url: "http://localhost:11434/v1", local: true },
@@ -28,6 +28,7 @@ const PRESETS: Record<ProviderType, { display_name: string; base_url: string; lo
 
 function ProviderStatusBadge({ providerId }: { providerId: string }) {
   const { data, isLoading, isError } = useLLMModels(providerId);
+  if (!providerId) return null;
   if (isLoading) return <span style={{ color: "#888" }}>Checking…</span>;
   if (isError || !data) return <span style={{ color: "#b00" }}>Offline</span>;
   return (
