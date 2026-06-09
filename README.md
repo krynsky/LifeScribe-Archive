@@ -7,11 +7,24 @@ embeddings, sidecar state — is rebuildable.
 
 ## Features
 
-- **Ingest** local documents (PDF, DOCX, XLSX, PPTX, EPUB, TXT, MD, HTML, JSON, CSV, images) using a Docling-first conversion router, then write canonical Markdown notes with full provenance.
+- **Ingest** local documents (PDF, DOCX, XLSX, PPTX, EPUB, TXT, MD, HTML, JSON, CSV, images) using a Docling-first extraction router. Docling handles all formats as primary engine; DOCX, XLSX, HTML, and images fall back to native extractors if Docling fails. Extracted content is written as canonical Markdown notes with full provenance frontmatter.
 - **Connect** to third-party services via a pluggable connector framework. v1 ships with File Drop; the framework supports file, manual-export, API-sync, watch-folder, and bridge connector types.
 - **Chat** with your vault using local (Ollama, LM Studio) or remote (GitHub Models, OpenAI, Anthropic) LLM providers through a unified, OpenAI-compatible interface. Retrieval uses SQLite FTS with citation back to exact notes.
 - **Browse** your vault through a desktop dashboard with import center, ingestion logs, note viewer, and settings.
 - **Privacy first** — local-first by default, per-source privacy labels (private / shareable / publishable / restricted), a "never leave the machine" master switch, and zero telemetry.
+
+## LLM Provider Setup
+
+Open **Settings → LLM Providers** and use the **Provider type** dropdown to select your provider. Choosing a preset auto-fills the display name, base URL, and local flag:
+
+| Provider type | Default base URL | Auth required |
+|---------------|-----------------|---------------|
+| Ollama | `http://localhost:11434/v1` | No |
+| LM Studio | `http://127.0.0.1:1234/v1` | No |
+| GitHub Models | `https://models.inference.ai.azure.com` | Token |
+| Custom | *(enter manually)* | Optional |
+
+Each provider row shows a live **Online · N models** / **Offline** status badge that polls the models endpoint. The Default Chat Model selector in Settings lets you pick a provider and model for all chat sessions.
 
 ## Tech stack
 
@@ -21,6 +34,7 @@ embeddings, sidecar state — is rebuildable.
 | Frontend | React 18, TypeScript, Vite, TanStack Query |
 | Backend | Python 3.12+, FastAPI, Pydantic v2, Uvicorn |
 | Storage | Git-backed Markdown vault (Obsidian-compatible) |
+| Document extraction | [Docling](https://github.com/DS4SD/docling) (primary), native extractors (fallback) |
 | Search | SQLite FTS5 |
 | Packaging | PyInstaller (backend sidecar), Tauri bundler (desktop) |
 

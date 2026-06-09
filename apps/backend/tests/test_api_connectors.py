@@ -60,9 +60,7 @@ def test_get_connectors_blocks_requires_network_when_privacy_on(
     connectors_dir = tmp_path / "connectors"
     connectors_dir.mkdir()
     _write_remote_manifest(connectors_dir)
-    monkeypatch.setattr(
-        "lifescribe.api.routers.connectors.connectors_dir", lambda: connectors_dir
-    )
+    monkeypatch.setattr("lifescribe.api.routers.connectors.connectors_dir", lambda: connectors_dir)
 
     r = client.put("/vault/settings", json={"privacy_mode": True}, headers=HEADERS)
     assert r.status_code == 200, r.text
